@@ -9,7 +9,7 @@
 #include "pico/stdlib.h"
 
 // Use the AppKey assigned to the LoRa-E5 module in the course device list.
-#define LORA_APP_KEY "00000000000000000000000000000000"
+#define LORA_APP_KEY "b45de710bc8b5818fa2af65cf01fcc8d"
 
 // UART0 is reserved for stdio/debug output, so the LoRa module is handled on UART1.
 #define EEPROM_I2C i2c0

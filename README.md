@@ -35,13 +35,13 @@ The monitor shows calibration, LoRa joining and dispense status output.
 
 ## LoRa AppKey
 
-The source file intentionally contains a placeholder AppKey:
+This private repository contains the AppKey assigned to the course LoRa-E5 module:
 
 ```c
-#define LORA_APP_KEY "00000000000000000000000000000000"
+#define LORA_APP_KEY "<course device AppKey>"
 ```
 
-Use the AppKey assigned to the LoRa-E5 module in the course device list before flashing to hardware. Do not commit real course keys to a public repository.
+Keep the repository private or replace the key with a placeholder before making the code public.
 
 ## Report
 
