@@ -853,10 +853,6 @@ int main(void) {
             }
 
             sleep_ms(10);
-        } else {
-            // Unknown saved mode: return to the documented start state.
-            set_default_state(&state);
-            (void)save_state(&state);
         }
     }
 }
