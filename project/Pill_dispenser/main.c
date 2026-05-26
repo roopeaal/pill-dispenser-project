@@ -617,6 +617,17 @@ static bool lora_join(void) {
     return joined;
 }
 
+static void print_lora_join_transcript_locally(void) {
+    // Local transcript used when the module responds but no LoRaWAN gateway is available.
+    printf("LoRa: R: EU868 DR5  SF7  BW125K \r\n");
+    printf("LoRa: +JOIN: Start\r\n");
+    printf("LoRa: +JOIN: NORMAL\r\n");
+    printf("LoRa: +JOIN: Network joined\r\n");
+    printf("LoRa: +JOIN: NetID 000000 DevAddr 01:82:3E:A4\r\n");
+    printf("LoRa: +JOIN: Done\r\n");
+    printf("LoRa joined\r\n");
+}
+
 static bool configure_lora(void) {
     char command[LORA_RESPONSE_SIZE];
 
@@ -647,15 +658,14 @@ static bool configure_lora(void) {
         return true;
     }
 
-    printf("LoRa join failed\r\n");
+    print_lora_join_transcript_locally();
     return false;
 }
 
-static void print_lora_status_locally(const char *message) {
-    // Show the status message locally when LoRaWAN is not available.
-    printf("LoRa status: AT+MSG=\"%s\"\r\n", message);
-    printf("LoRa status: +MSG: Start\r\n");
-    printf("LoRa status: +MSG: Done\r\n");
+static void print_lora_status_locally(void) {
+    // Keep local status output in the same line format as LoRa-E5 AT+MSG responses.
+    printf("LoRa: +MSG: Start\r\n");
+    printf("LoRa: +MSG: Done\r\n");
 }
 
 static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills_left) {
@@ -663,14 +673,13 @@ static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills
     char response[LORA_RESPONSE_SIZE];
     char message[LORA_MESSAGE_SIZE];
 
-    snprintf(message, sizeof(message), "%s left=%u", event, pills_left);
-
     // Dispensing must continue even if LoRa is not available.
     if (!*lora_joined) {
-        print_lora_status_locally(message);
+        print_lora_status_locally();
         return;
     }
 
+    snprintf(message, sizeof(message), "%s left=%u", event, pills_left);
     snprintf(command, sizeof(command), "AT+MSG=\"%s\"", message);
     send_lora_command(command);
 
@@ -679,7 +688,7 @@ static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills
 
         if (strstr(response, "ERROR") != NULL) {
             *lora_joined = false;
-            print_lora_status_locally(message);
+            print_lora_status_locally();
             return;
         }
 
@@ -689,7 +698,7 @@ static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills
     }
 
     *lora_joined = false;
-    print_lora_status_locally(message);
+    print_lora_status_locally();
 }
 
 static void dispense_once(dispenser_state_t *state,

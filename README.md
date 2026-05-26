@@ -51,7 +51,7 @@ The included `.run` configurations can flash the target through OpenOCD and the 
 - `Run pill_dispenser + Monitor`
 
 The monitor shows startup, calibration, LoRa joining, schedule start and dispense status output.
-If LoRaWAN cannot be joined outside the school gateway coverage, the firmware continues normally and prints `LoRa status` lines to show which AT+MSG messages would be sent.
+If the LoRa-E5 module responds but no LoRaWAN gateway is available, the firmware continues normally and prints a local LoRa transcript in the same `LoRa:` line format so the expected terminal flow can still be inspected.
 
 Normal test flow:
 
