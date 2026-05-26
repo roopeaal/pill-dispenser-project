@@ -651,17 +651,26 @@ static bool configure_lora(void) {
     return false;
 }
 
+static void print_lora_offline_status(const char *message) {
+    // Used when LoRaWAN cannot be joined, for example outside the school gateway coverage.
+    printf("LoRa offline demo: AT+MSG=\"%s\"\r\n", message);
+    printf("LoRa offline demo: +MSG: Start\r\n");
+    printf("LoRa offline demo: +MSG: Done\r\n");
+}
+
 static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills_left) {
     char command[LORA_MESSAGE_SIZE + 16u];
     char response[LORA_RESPONSE_SIZE];
     char message[LORA_MESSAGE_SIZE];
 
+    snprintf(message, sizeof(message), "%s left=%u", event, pills_left);
+
     // Dispensing must continue even if LoRa is not available.
     if (!*lora_joined) {
+        print_lora_offline_status(message);
         return;
     }
 
-    snprintf(message, sizeof(message), "%s left=%u", event, pills_left);
     snprintf(command, sizeof(command), "AT+MSG=\"%s\"", message);
     send_lora_command(command);
 
@@ -670,6 +679,7 @@ static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills
 
         if (strstr(response, "ERROR") != NULL) {
             *lora_joined = false;
+            print_lora_offline_status(message);
             return;
         }
 
@@ -679,6 +689,7 @@ static void lora_send_status(bool *lora_joined, const char *event, uint8_t pills
     }
 
     *lora_joined = false;
+    print_lora_offline_status(message);
 }
 
 static void dispense_once(dispenser_state_t *state,
@@ -792,6 +803,9 @@ int main(void) {
     }
 
     lora_joined = configure_lora();
+    if (!lora_joined) {
+        printf("LoRa offline demo: LoRaWAN not joined, printing status messages locally\r\n");
+    }
     lora_send_status(&lora_joined, state.turn_in_progress ? "boot_recover" : "boot", state.pills_left);
 
     bool complete_interrupted_turn = false;
